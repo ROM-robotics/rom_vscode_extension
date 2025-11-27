@@ -1,0 +1,90 @@
+{
+  "name": "robot-code-sync",
+  "displayName": "Robot Code Sync",
+  "description": "Sync code to robot using rsync with one button click",
+  "version": "0.0.1",
+  "publisher": "rom-robotics-llc",
+  "icon": "rom_logo.png",
+  "engines": {
+    "vscode": "^1.106.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "robot-code-sync.syncToRobot",
+        "title": "Robot Code Sync: Sync to Robot"
+      },
+      {
+        "command": "robot-code-sync.openSSH",
+        "title": "Robot Code Sync: Open SSH Terminal"
+      }
+    ],
+    "configuration": {
+      "title": "Robot Code Sync",
+      "properties": {
+        "robotCodeSync.sourcePath": {
+          "type": "string",
+          "default": "/home/mr_robot/Desktop/Git/rom_robotics/rom_nav2_ws",
+          "description": "Source path on local computer to sync from"
+        },
+        "robotCodeSync.destinationPath": {
+          "type": "string",
+          "default": "/home/mr_robot/Desktop/Git/rom_robotics/rom_nav2_ws",
+          "description": "Destination path on robot"
+        },
+        "robotCodeSync.robotHost": {
+          "type": "string",
+          "default": "robot@192.168.1.100",
+          "description": "Robot SSH host (e.g., robot@192.168.1.100)"
+        },
+        "robotCodeSync.robotPassword": {
+          "type": "string",
+          "default": "",
+          "description": "Robot SSH password (leave empty to use SSH keys)"
+        },
+        "robotCodeSync.excludePatterns": {
+          "type": "array",
+          "default": [".git", "node_modules", ".vscode", "dist", "out", "*.pyc", "__pycache__", "build", "install", "log"],
+          "description": "Patterns to exclude from sync"
+        },
+        "robotCodeSync.showStatusBar": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show sync button in status bar"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "compile": "npm run check-types && npm run lint && node esbuild.js",
+    "watch": "npm-run-all -p watch:*",
+    "watch:esbuild": "node esbuild.js --watch",
+    "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
+    "package": "npm run check-types && npm run lint && node esbuild.js --production",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "npm run compile-tests && npm run compile && npm run lint",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.106.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "22.x",
+    "@typescript-eslint/eslint-plugin": "^8.39.0",
+    "@typescript-eslint/parser": "^8.39.0",
+    "eslint": "^9.32.0",
+    "esbuild": "^0.25.8",
+    "npm-run-all": "^4.1.5",
+    "typescript": "^5.9.2",
+    "@vscode/test-cli": "^0.0.11",
+    "@vscode/test-electron": "^2.5.2"
+  }
+}
