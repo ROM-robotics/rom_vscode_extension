@@ -148,6 +148,28 @@ export function activate(context: vscode.ExtensionContext) {
 	const buildDriversCommand = createBuildCommand('RomDriversWs', 'rom_drivers_ws');
 	const buildThirdpartyCommand = createBuildCommand('ThirdpartyDriversWs', 'thirdparty_drivers_ws');
 
+	// Register Build All command
+	const buildAllCommand = vscode.commands.registerCommand('robot-code-sync.buildAll', async () => {
+		const config = vscode.workspace.getConfiguration('robotCodeSync');
+		const robotHost = config.get<string>('robotHost', 'robot@192.168.1.100');
+		const robotPassword = config.get<string>('robotPassword', '');
+
+		const terminal = vscode.window.createTerminal({
+			name: 'Build All',
+			shellPath: '/bin/bash'
+		});
+
+		const buildCommand = 'cd ~/rom_sdk_ws && colcon build && cd ~/rom_drivers_ws && colcon build && cd ~/rom_nav2_ws && colcon build';
+
+		if (robotPassword) {
+			terminal.sendText(`sshpass -p '${robotPassword}' ssh -t ${robotHost} "${buildCommand}"`);
+		} else {
+			terminal.sendText(`ssh -t ${robotHost} "${buildCommand}"`);
+		}
+		
+		terminal.show();
+	});
+
 	// Register SSH terminal command
 	const sshCommand = vscode.commands.registerCommand('robot-code-sync.openSSH', async () => {
 		const config = vscode.workspace.getConfiguration('robotCodeSync');
@@ -177,6 +199,7 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(buildNav2Command);
 	context.subscriptions.push(buildDriversCommand);
 	context.subscriptions.push(buildThirdpartyCommand);
+	context.subscriptions.push(buildAllCommand);
 	context.subscriptions.push(sshCommand);
 	context.subscriptions.push(settingsCommand);
 }

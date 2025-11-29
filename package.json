@@ -60,12 +60,28 @@
         "title": "Robot Code Sync: Build thirdparty_drivers_ws"
       },
       {
+        "command": "robot-code-sync.buildAll",
+        "title": "Robot Code Sync: Build All"
+      },
+      {
         "command": "robot-code-sync.openSSH",
         "title": "Robot Code Sync: Open Robot Terminal"
       },
       {
         "command": "robot-code-sync.openSettings",
         "title": "Robot Code Sync: Open Settings"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "robot-code-sync.syncAllToRobot",
+        "key": "ctrl+shift+r",
+        "mac": "cmd+shift+r"
+      },
+      {
+        "command": "robot-code-sync.buildAll",
+        "key": "ctrl+shift+b",
+        "mac": "cmd+shift+b"
       }
     ],
     "configuration": [
