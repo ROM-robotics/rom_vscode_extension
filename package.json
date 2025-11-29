@@ -16,49 +16,195 @@
   "contributes": {
     "commands": [
       {
-        "command": "robot-code-sync.syncToRobot",
-        "title": "Robot Code Sync: Sync to Robot"
+        "command": "robot-code-sync.syncNav2WsToRobot",
+        "title": "Robot Code Sync: Sync nav2_ws to Robot"
+      },
+      {
+        "command": "robot-code-sync.syncDataToRobot",
+        "title": "Robot Code Sync: Sync ~/data to Robot"
+      },
+      {
+        "command": "robot-code-sync.syncMytmuxToRobot",
+        "title": "Robot Code Sync: Sync mytmux to Robot"
+      },
+      {
+        "command": "robot-code-sync.syncSdkWsToRobot",
+        "title": "Robot Code Sync: Sync rom_sdk_ws to Robot"
+      },
+      {
+        "command": "robot-code-sync.syncDriversWsToRobot",
+        "title": "Robot Code Sync: Sync rom_drivers_ws to Robot"
+      },
+      {
+        "command": "robot-code-sync.syncThirdpartyDriversWsToRobot",
+        "title": "Robot Code Sync: Sync thirdparty_drivers_ws to Robot"
+      },
+      {
+        "command": "robot-code-sync.syncAllToRobot",
+        "title": "Robot Code Sync: Sync All to Robot"
+      },
+      {
+        "command": "robot-code-sync.buildRomSdkWs",
+        "title": "Robot Code Sync: Build rom_sdk_ws"
+      },
+      {
+        "command": "robot-code-sync.buildRomNav2Ws",
+        "title": "Robot Code Sync: Build rom_nav2_ws"
+      },
+      {
+        "command": "robot-code-sync.buildRomDriversWs",
+        "title": "Robot Code Sync: Build rom_drivers_ws"
+      },
+      {
+        "command": "robot-code-sync.buildThirdpartyDriversWs",
+        "title": "Robot Code Sync: Build thirdparty_drivers_ws"
       },
       {
         "command": "robot-code-sync.openSSH",
-        "title": "Robot Code Sync: Open SSH Terminal"
+        "title": "Robot Code Sync: Open Robot Terminal"
+      },
+      {
+        "command": "robot-code-sync.openSettings",
+        "title": "Robot Code Sync: Open Settings"
       }
     ],
-    "configuration": {
-      "title": "Robot Code Sync",
-      "properties": {
-        "robotCodeSync.sourcePath": {
-          "type": "string",
-          "default": "/home/mr_robot/Desktop/Git/rom_robotics/rom_nav2_ws",
-          "description": "Source path on local computer to sync from"
-        },
-        "robotCodeSync.destinationPath": {
-          "type": "string",
-          "default": "/home/mr_robot/Desktop/Git/rom_robotics/rom_nav2_ws",
-          "description": "Destination path on robot"
-        },
-        "robotCodeSync.robotHost": {
-          "type": "string",
-          "default": "robot@192.168.1.100",
-          "description": "Robot SSH host (e.g., robot@192.168.1.100)"
-        },
-        "robotCodeSync.robotPassword": {
-          "type": "string",
-          "default": "",
-          "description": "Robot SSH password (leave empty to use SSH keys)"
-        },
-        "robotCodeSync.excludePatterns": {
-          "type": "array",
-          "default": [".git", "node_modules", ".vscode", "dist", "out", "*.pyc", "__pycache__", "build", "install", "log"],
-          "description": "Patterns to exclude from sync"
-        },
-        "robotCodeSync.showStatusBar": {
-          "type": "boolean",
-          "default": true,
-          "description": "Show sync button in status bar"
+    "configuration": [
+      {
+        "title": "rom_nav2_ws",
+        "properties": {
+          "robotCodeSync.rom_nav2_ws_sourcePath": {
+            "type": "string",
+            "default": "/home/mr_robot/Desktop/Git/rom_robotics/rom_nav2_ws",
+            "description": "Source Path"
+          },
+          "robotCodeSync.rom_nav2_ws_destinationPath": {
+            "type": "string",
+            "default": "/home/mr_robot/Desktop/Git/rom_robotics/rom_nav2_ws",
+            "description": "Destination Path"
+          }
+        }
+      },
+      {
+        "title": "data",
+        "properties": {
+          "robotCodeSync.data_sourcePath": {
+            "type": "string",
+            "default": "/home/mr_robot/Desktop/Git/rom_robotics/data",
+            "description": "Source Path"
+          },
+          "robotCodeSync.data_destinationPath": {
+            "type": "string",
+            "default": "/home/mr_robot/data",
+            "description": "Destination Path"
+          }
+        }
+      },
+      {
+        "title": "mytmux",
+        "properties": {
+          "robotCodeSync.mytmux_sourcePath": {
+            "type": "string",
+            "default": "/home/mr_robot/Desktop/Git/rom_robotics/mytmux",
+            "description": "Source Path"
+          },
+          "robotCodeSync.mytmux_destinationPath": {
+            "type": "string",
+            "default": "/home/mr_robot/Desktop/Git/rom_robotics/mytmux",
+            "description": "Destination Path"
+          }
+        }
+      },
+      {
+        "title": "rom_sdk_ws",
+        "properties": {
+          "robotCodeSync.rom_sdk_ws_sourcePath": {
+            "type": "string",
+            "default": "/home/mr_robot/Desktop/Git/rom_robotics/rom_sdk_ws",
+            "description": "Source Path"
+          },
+          "robotCodeSync.rom_sdk_ws_destinationPath": {
+            "type": "string",
+            "default": "/home/mr_robot/Desktop/Git/rom_robotics/rom_sdk_ws",
+            "description": "Destination Path"
+          }
+        }
+      },
+      {
+        "title": "rom_drivers_ws",
+        "properties": {
+          "robotCodeSync.rom_drivers_ws_sourcePath": {
+            "type": "string",
+            "default": "/home/mr_robot/Desktop/Git/rom_robotics/rom_drivers_ws",
+            "description": "Source Path"
+          },
+          "robotCodeSync.rom_drivers_ws_destinationPath": {
+            "type": "string",
+            "default": "/home/mr_robot/Desktop/Git/rom_robotics/rom_drivers_ws",
+            "description": "Destination Path"
+          }
+        }
+      },
+      {
+        "title": "thirdparty_drivers_ws",
+        "properties": {
+          "robotCodeSync.thirdparty_drivers_ws_sourcePath": {
+            "type": "string",
+            "default": "/home/mr_robot/Desktop/Git/rom_robotics/thirdparty_drivers_ws",
+            "description": "Source Path"
+          },
+          "robotCodeSync.thirdparty_drivers_ws_destinationPath": {
+            "type": "string",
+            "default": "/home/mr_robot/Desktop/Git/rom_robotics/thirdparty_drivers_ws",
+            "description": "Destination Path"
+          }
+        }
+      },
+      {
+        "title": "Sync All",
+        "properties": {
+          "robotCodeSync.all_sourcePath": {
+            "type": "string",
+            "default": "/home/mr_robot/Desktop/Git/rom_robotics",
+            "description": "Source Path"
+          },
+          "robotCodeSync.all_destinationPath": {
+            "type": "string",
+            "default": "/home/mr_robot/Desktop/Git/rom_robotics",
+            "description": "Destination Path"
+          }
+        }
+      },
+      {
+        "title": "Robot Connection",
+        "properties": {
+          "robotCodeSync.robotHost": {
+            "type": "string",
+            "default": "robot@192.168.1.100",
+            "description": "e.g., mr_robot@192.168.1.12"
+          },
+          "robotCodeSync.robotPassword": {
+            "type": "string",
+            "default": "",
+            "description": "Password (leave empty to use SSH keys)"
+          }
+        }
+      },
+      {
+        "title": "Sync Options",
+        "properties": {
+          "robotCodeSync.excludePatterns": {
+            "type": "array",
+            "default": [".git", "node_modules", ".vscode", "dist", "out", "*.pyc", "__pycache__", "build", "install", "log"],
+            "description": "Patterns to exclude from sync"
+          },
+          "robotCodeSync.showStatusBar": {
+            "type": "boolean",
+            "default": true,
+            "description": "Show sync button in status bar"
+          }
         }
       }
-    }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "npm run package",

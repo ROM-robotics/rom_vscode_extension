@@ -1,18 +1,94 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-import { exec, spawn } from 'child_process';
+import { exec } from 'child_process';
 import * as fs from 'fs';
 
+// Generic sync function
+async function performSync(sourcePathKey: string, destinationPathKey: string, workspaceName: string) {
+	const config = vscode.workspace.getConfiguration('robotCodeSync');
+	let sourcePath = config.get<string>(sourcePathKey, '');
+	let destinationPath = config.get<string>(destinationPathKey, '');
+	const robotHost = config.get<string>('robotHost', 'robot@192.168.1.100');
+	const robotPassword = config.get<string>('robotPassword', '');
+	const excludePatterns = config.get<string[]>('excludePatterns', ['.git', 'node_modules']);
+
+	// Validate source path
+	if (!fs.existsSync(sourcePath)) {
+		vscode.window.showErrorMessage(`Source path does not exist: ${sourcePath}`);
+		return;
+	}
+
+	// Confirm sync
+	const answer = await vscode.window.showInformationMessage(
+		`Sync ${workspaceName}\nFrom: ${sourcePath}\nTo: ${robotHost}:${destinationPath}`,
+		'Yes',
+		'No'
+	);
+
+	if (answer !== 'Yes') {
+		return;
+	}
+
+	// Build rsync command
+	if (!sourcePath.endsWith('/')) {
+		sourcePath += '/';
+	}
+	const excludeArgs = excludePatterns.map(pattern => `--exclude='${pattern}'`).join(' ');
+	
+	let rsyncCommand: string;
+	if (robotPassword) {
+		rsyncCommand = `sshpass -p '${robotPassword}' rsync -avz --delete ${excludeArgs} "${sourcePath}" ${robotHost}:"${destinationPath}"`;
+	} else {
+		rsyncCommand = `rsync -avz --delete ${excludeArgs} "${sourcePath}" ${robotHost}:"${destinationPath}"`;
+	}
+
+	// Show progress
+	vscode.window.withProgress({
+		location: vscode.ProgressLocation.Notification,
+		title: `Syncing ${workspaceName} to robot...`,
+		cancellable: false
+	}, async (progress) => {
+		return new Promise<void>((resolve, reject) => {
+			exec(rsyncCommand, { maxBuffer: 1024 * 1024 * 10 }, (error, stdout, stderr) => {
+				if (error) {
+					vscode.window.showErrorMessage(`Sync failed: ${error.message}`);
+					const channel = vscode.window.createOutputChannel('Robot Code Sync');
+					channel.appendLine('Error:');
+					channel.appendLine(error.message);
+					if (stderr) {
+						channel.appendLine('\nStderr:');
+						channel.appendLine(stderr);
+					}
+					channel.appendLine('\nCommand:');
+					channel.appendLine(rsyncCommand.replace(robotPassword, '***'));
+					channel.show();
+					reject(error);
+					return;
+				}
+
+				vscode.window.showInformationMessage(`✅ ${workspaceName} synced to robot successfully!`);
+				
+				if (stdout) {
+					const channel = vscode.window.createOutputChannel('Robot Code Sync');
+					channel.appendLine(`Sync completed for ${workspaceName}:`);
+					channel.appendLine(stdout);
+				}
+				
+				resolve();
+			});
+		});
+	});
+}
+
 // This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
 
 	console.log('Robot Code Sync extension is now active!');
 
 	// Create status bar item
 	const statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
-	statusBarItem.command = 'robot-code-sync.syncToRobot';
+	statusBarItem.command = 'robot-code-sync.syncNav2WsToRobot';
 	statusBarItem.text = '$(cloud-upload) Sync to Robot';
 	statusBarItem.tooltip = 'Click to sync code to robot';
 	
@@ -22,95 +98,55 @@ export function activate(context: vscode.ExtensionContext) {
 	}
 	context.subscriptions.push(statusBarItem);
 
-	// Register the sync command
-	const syncCommand = vscode.commands.registerCommand('robot-code-sync.syncToRobot', async () => {
-		const config = vscode.workspace.getConfiguration('robotCodeSync');
-		let sourcePath = config.get<string>('sourcePath', '/home/mr_robot/Desktop/Git/rom_robotics/rom_nav2_ws');
-		let destinationPath = config.get<string>('destinationPath', '/home/mr_robot/Desktop/Git/rom_robotics/rom_nav2_ws');
-		const robotHost = config.get<string>('robotHost', 'robot@192.168.1.100');
-		const robotPassword = config.get<string>('robotPassword', '');
-		const excludePatterns = config.get<string[]>('excludePatterns', ['.git', 'node_modules']);
+	// Register all sync commands
+	context.subscriptions.push(vscode.commands.registerCommand('robot-code-sync.syncNav2WsToRobot', () => 
+		performSync('rom_nav2_ws_sourcePath', 'rom_nav2_ws_destinationPath', 'nav2_ws')));
+	
+	context.subscriptions.push(vscode.commands.registerCommand('robot-code-sync.syncDataToRobot', () => 
+		performSync('data_sourcePath', 'data_destinationPath', '~/data')));
+	
+	context.subscriptions.push(vscode.commands.registerCommand('robot-code-sync.syncMytmuxToRobot', () => 
+		performSync('mytmux_sourcePath', 'mytmux_destinationPath', 'mytmux')));
+	
+	context.subscriptions.push(vscode.commands.registerCommand('robot-code-sync.syncSdkWsToRobot', () => 
+		performSync('rom_sdk_ws_sourcePath', 'rom_sdk_ws_destinationPath', 'rom_sdk_ws')));
+	
+	context.subscriptions.push(vscode.commands.registerCommand('robot-code-sync.syncDriversWsToRobot', () => 
+		performSync('rom_drivers_ws_sourcePath', 'rom_drivers_ws_destinationPath', 'rom_drivers_ws')));
+	
+	context.subscriptions.push(vscode.commands.registerCommand('robot-code-sync.syncThirdpartyDriversWsToRobot', () => 
+		performSync('thirdparty_drivers_ws_sourcePath', 'thirdparty_drivers_ws_destinationPath', 'thirdparty_drivers_ws')));
+	
+	context.subscriptions.push(vscode.commands.registerCommand('robot-code-sync.syncAllToRobot', () => 
+		performSync('all_sourcePath', 'all_destinationPath', 'All')));
 
-		// Validate source path
-		if (!fs.existsSync(sourcePath)) {
-			const newSource = await vscode.window.showInputBox({
-				prompt: 'Source path does not exist. Enter valid source path:',
-				value: sourcePath,
-				validateInput: (value) => {
-					return fs.existsSync(value) ? null : 'Path does not exist';
-				}
+	// Generic build function
+	const createBuildCommand = (workspace: string, displayName: string) => {
+		return vscode.commands.registerCommand(`robot-code-sync.build${workspace}`, async () => {
+			const config = vscode.workspace.getConfiguration('robotCodeSync');
+			const robotHost = config.get<string>('robotHost', 'robot@192.168.1.100');
+			const robotPassword = config.get<string>('robotPassword', '');
+
+			const terminal = vscode.window.createTerminal({
+				name: `Build ${displayName}`,
+				shellPath: '/bin/bash'
 			});
-			if (!newSource) {
-				return;
+
+			if (robotPassword) {
+				terminal.sendText(`sshpass -p '${robotPassword}' ssh -t ${robotHost} "cd ~/${displayName} && colcon build"`);
+			} else {
+				terminal.sendText(`ssh -t ${robotHost} "cd ~/${displayName} && colcon build"`);
 			}
-			sourcePath = newSource;
-			await config.update('sourcePath', sourcePath, vscode.ConfigurationTarget.Global);
-		}
-
-		// Confirm sync
-		const answer = await vscode.window.showInformationMessage(
-			`Sync from:\n${sourcePath}\n\nTo:\n${robotHost}:${destinationPath}`,
-			'Yes',
-			'No'
-		);
-
-		if (answer !== 'Yes') {
-			return;
-		}
-
-		// Build rsync command
-		if (!sourcePath.endsWith('/')) {
-			sourcePath += '/';
-		}
-		const excludeArgs = excludePatterns.map(pattern => `--exclude='${pattern}'`).join(' ');
-		
-		let rsyncCommand: string;
-		if (robotPassword) {
-			// Use sshpass for password authentication
-			rsyncCommand = `sshpass -p '${robotPassword}' rsync -avz --delete ${excludeArgs} "${sourcePath}" ${robotHost}:"${destinationPath}"`;
-		} else {
-			// Use SSH keys
-			rsyncCommand = `rsync -avz --delete ${excludeArgs} "${sourcePath}" ${robotHost}:"${destinationPath}"`;
-		}
-
-		// Show progress
-		vscode.window.withProgress({
-			location: vscode.ProgressLocation.Notification,
-			title: 'Syncing to robot...',
-			cancellable: false
-		}, async (progress) => {
-			return new Promise<void>((resolve, reject) => {
-				exec(rsyncCommand, (error, stdout, stderr) => {
-					if (error) {
-						vscode.window.showErrorMessage(`Sync failed: ${error.message}`);
-						const channel = vscode.window.createOutputChannel('Robot Code Sync');
-						channel.appendLine('Error:');
-						channel.appendLine(error.message);
-						if (stderr) {
-							channel.appendLine('\nStderr:');
-							channel.appendLine(stderr);
-						}
-						channel.appendLine('\nCommand:');
-						channel.appendLine(rsyncCommand.replace(robotPassword, '***'));
-						channel.show();
-						reject(error);
-						return;
-					}
-
-					vscode.window.showInformationMessage('✅ Code synced to robot successfully!');
-					
-					// Show output if verbose
-					if (stdout) {
-						const channel = vscode.window.createOutputChannel('Robot Code Sync');
-						channel.appendLine('Sync completed:');
-						channel.appendLine(stdout);
-					}
-					
-					resolve();
-				});
-			});
+			
+			terminal.show();
 		});
-	});
+	};
+
+	// Register build commands
+	const buildSdkCommand = createBuildCommand('RomSdkWs', 'rom_sdk_ws');
+	const buildNav2Command = createBuildCommand('RomNav2Ws', 'rom_nav2_ws');
+	const buildDriversCommand = createBuildCommand('RomDriversWs', 'rom_drivers_ws');
+	const buildThirdpartyCommand = createBuildCommand('ThirdpartyDriversWs', 'thirdparty_drivers_ws');
 
 	// Register SSH terminal command
 	const sshCommand = vscode.commands.registerCommand('robot-code-sync.openSSH', async () => {
@@ -124,18 +160,25 @@ export function activate(context: vscode.ExtensionContext) {
 		});
 
 		if (robotPassword) {
-			// Use sshpass for password authentication
 			terminal.sendText(`sshpass -p '${robotPassword}' ssh ${robotHost}`);
 		} else {
-			// Use SSH keys
 			terminal.sendText(`ssh ${robotHost}`);
 		}
 		
 		terminal.show();
 	});
 
-	context.subscriptions.push(syncCommand);
+	// Register open settings command
+	const settingsCommand = vscode.commands.registerCommand('robot-code-sync.openSettings', () => {
+		vscode.commands.executeCommand('workbench.action.openSettings', '@ext:rom-robotics-llc.robot-code-sync');
+	});
+
+	context.subscriptions.push(buildSdkCommand);
+	context.subscriptions.push(buildNav2Command);
+	context.subscriptions.push(buildDriversCommand);
+	context.subscriptions.push(buildThirdpartyCommand);
 	context.subscriptions.push(sshCommand);
+	context.subscriptions.push(settingsCommand);
 }
 
 // This method is called when your extension is deactivated
