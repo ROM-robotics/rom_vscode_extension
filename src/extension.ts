@@ -170,6 +170,27 @@ export function activate(context: vscode.ExtensionContext) {
 		terminal.show();
 	});
 
+	// Register Run GUI command
+	const runGuiCommand = vscode.commands.registerCommand('robot-code-sync.runGui', async () => {
+		const config = vscode.workspace.getConfiguration('robotCodeSync');
+		const appImagePath = config.get<string>('appImagePath', '/home/mr_robot/Desktop/Git/rom_robotics/data/app/rom_dynamics_multi_robots_gui-linux-linux-v0.0.1.AppImage');
+
+		if (!fs.existsSync(appImagePath)) {
+			vscode.window.showErrorMessage(`AppImage not found: ${appImagePath}`);
+			return;
+		}
+
+		const terminal = vscode.window.createTerminal({
+			name: 'ROM GUI',
+			shellPath: '/bin/bash'
+		});
+
+		// Make executable then run (safer in case permissions are missing)
+		terminal.sendText(`chmod +x "${appImagePath}" && "${appImagePath}"`);
+		terminal.show();
+		vscode.window.showInformationMessage('ROM GUI launched!');
+	});
+
 	// Register SSH terminal command
 	const sshCommand = vscode.commands.registerCommand('robot-code-sync.openSSH', async () => {
 		const config = vscode.workspace.getConfiguration('robotCodeSync');
@@ -200,6 +221,7 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(buildDriversCommand);
 	context.subscriptions.push(buildThirdpartyCommand);
 	context.subscriptions.push(buildAllCommand);
+	context.subscriptions.push(runGuiCommand);
 	context.subscriptions.push(sshCommand);
 	context.subscriptions.push(settingsCommand);
 }
