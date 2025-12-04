@@ -72,6 +72,10 @@
         "title": "Robot Code Sync: Run Tuning App"
       },
       {
+        "command": "robot-code-sync.runGroot",
+        "title": "Robot Code Sync: Run Groot"
+      },
+      {
         "command": "robot-code-sync.openSSH",
         "title": "Robot Code Sync: Open Robot Terminal"
       },
@@ -100,6 +104,11 @@
         "command": "robot-code-sync.runTuningApp",
         "key": "ctrl+shift+t",
         "mac": "cmd+shift+t"
+      },
+      {
+        "command": "robot-code-sync.runGroot",
+        "key": "ctrl+shift+o",
+        "mac": "cmd+shift+o"
       }
     ],
     "configuration": [
@@ -246,6 +255,11 @@
             "type": "string",
             "default": "/home/mr_robot/data/app/tuning_app-linux-linux-v0.0.1.AppImage",
             "description": "Path to the Tuning App AppImage file"
+          },
+          "robotCodeSync.grootAppPath": {
+            "type": "string",
+            "default": "/home/mr_robot/data/app/Groot-1.0.0-x86_64.AppImage",
+            "description": "Path to the Groot AppImage file"
           }
         }
       }

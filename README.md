@@ -18,6 +18,7 @@
 | **Build All** | `Ctrl+Shift+B` | `Cmd+Shift+B` | Workspaces အားလုံး build လုပ်မယ် |
 | **Run GUI** | `Ctrl+Shift+G` | `Cmd+Shift+G` | ROM GUI AppImage ကို run မယ် |
 | **Run Tuning App** | `Ctrl+Shift+T` | `Cmd+Shift+T` | Tuning App ကို run မယ် |
+| **Run Groot** | `Ctrl+Shift+O` | `Cmd+Shift+O` | Groot app directory ကို nautilus နဲ့ဖွင့်မယ် |
 
 ## Installation
 

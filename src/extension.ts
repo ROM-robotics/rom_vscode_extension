@@ -217,6 +217,30 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.window.showInformationMessage('Tuning App launched!');
 	});
 
+	// Register Run Groot command - Opens app directory in file manager
+	const runGrootCommand = vscode.commands.registerCommand('robot-code-sync.runGroot', async () => {
+		const config = vscode.workspace.getConfiguration('robotCodeSync');
+		const grootAppPath = config.get<string>('grootAppPath', '/home/mr_robot/data/app/Groot-1.0.0-x86_64.AppImage');
+
+		// Get directory path from the full AppImage path
+		const grootDirectory = grootAppPath.substring(0, grootAppPath.lastIndexOf('/'));
+
+		if (!fs.existsSync(grootDirectory)) {
+			vscode.window.showErrorMessage(`Groot directory not found: ${grootDirectory}`);
+			return;
+		}
+
+		const terminal = vscode.window.createTerminal({
+			name: 'Groot',
+			shellPath: '/bin/bash'
+		});
+
+		// Open directory with nautilus file manager
+		terminal.sendText(`nautilus "${grootDirectory}"`);
+		terminal.show();
+		vscode.window.showInformationMessage(`Opened Groot directory: ${grootDirectory}`);
+	});
+
 	// Register SSH terminal command
 	const sshCommand = vscode.commands.registerCommand('robot-code-sync.openSSH', async () => {
 		const config = vscode.workspace.getConfiguration('robotCodeSync');
@@ -249,6 +273,7 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(buildAllCommand);
 	context.subscriptions.push(runGuiCommand);
 	context.subscriptions.push(runTuningAppCommand);
+	context.subscriptions.push(runGrootCommand);
 	context.subscriptions.push(sshCommand);
 	context.subscriptions.push(settingsCommand);
 }
