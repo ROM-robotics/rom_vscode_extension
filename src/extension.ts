@@ -191,6 +191,32 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.window.showInformationMessage('ROM GUI launched!');
 	});
 
+	// Register Run Tuning App command
+	const runTuningAppCommand = vscode.commands.registerCommand('robot-code-sync.runTuningApp', async () => {
+		const config = vscode.workspace.getConfiguration('robotCodeSync');
+		const tuningAppPath = config.get<string>('tuningAppPath', '/home/mr_robot/data/app/tuning_app-linux-linux-v0.0.1.AppImage');
+		const robotHost = config.get<string>('robotHost', 'robot@192.168.1.100');
+		const robotPassword = config.get<string>('robotPassword', '');
+
+		if (!fs.existsSync(tuningAppPath)) {
+			vscode.window.showErrorMessage(`Tuning App not found: ${tuningAppPath}`);
+			return;
+		}
+
+		// Extract IP address from robotHost (format: user@ip)
+		const ipAddress = robotHost.includes('@') ? robotHost.split('@')[1] : robotHost;
+
+		const terminal = vscode.window.createTerminal({
+			name: 'Tuning App',
+			shellPath: '/bin/bash'
+		});
+
+		// Make executable then run with IP and password arguments
+		terminal.sendText(`chmod +x "${tuningAppPath}" && "${tuningAppPath}" -i ${ipAddress} -p "${robotPassword}"`);
+		terminal.show();
+		vscode.window.showInformationMessage('Tuning App launched!');
+	});
+
 	// Register SSH terminal command
 	const sshCommand = vscode.commands.registerCommand('robot-code-sync.openSSH', async () => {
 		const config = vscode.workspace.getConfiguration('robotCodeSync');
@@ -222,6 +248,7 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(buildThirdpartyCommand);
 	context.subscriptions.push(buildAllCommand);
 	context.subscriptions.push(runGuiCommand);
+	context.subscriptions.push(runTuningAppCommand);
 	context.subscriptions.push(sshCommand);
 	context.subscriptions.push(settingsCommand);
 }

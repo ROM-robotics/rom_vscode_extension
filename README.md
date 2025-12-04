@@ -10,6 +10,15 @@
 - 📊 Progress indicator နဲ့ notification တွေပါတယ်
 - 🔍 Output channel မှာ detailed sync logs ကြည့်လို့ရတယ်
 
+## Keyboard Shortcuts
+
+| Command | Shortcut (Windows/Linux) | Shortcut (Mac) | Description |
+|---------|-------------------------|----------------|-------------|
+| **Sync All to Robot** | `Ctrl+Shift+R` | `Cmd+Shift+R` | အားလုံး robot ကို sync လုပ်မယ် |
+| **Build All** | `Ctrl+Shift+B` | `Cmd+Shift+B` | Workspaces အားလုံး build လုပ်မယ် |
+| **Run GUI** | `Ctrl+Shift+G` | `Cmd+Shift+G` | ROM GUI AppImage ကို run မယ် |
+| **Run Tuning App** | `Ctrl+Shift+T` | `Cmd+Shift+T` | Tuning App ကို run မယ် |
+
 ## Installation
 
 ### Method 1: Install from VSIX File (Recommended)

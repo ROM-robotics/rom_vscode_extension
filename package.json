@@ -68,6 +68,10 @@
         "title": "Robot Code Sync: Run GUI"
       },
       {
+        "command": "robot-code-sync.runTuningApp",
+        "title": "Robot Code Sync: Run Tuning App"
+      },
+      {
         "command": "robot-code-sync.openSSH",
         "title": "Robot Code Sync: Open Robot Terminal"
       },
@@ -91,6 +95,11 @@
         "command": "robot-code-sync.runGui",
         "key": "ctrl+shift+g",
         "mac": "cmd+shift+g"
+      },
+      {
+        "command": "robot-code-sync.runTuningApp",
+        "key": "ctrl+shift+t",
+        "mac": "cmd+shift+t"
       }
     ],
     "configuration": [
@@ -232,6 +241,11 @@
             "type": "string",
             "default": "/home/mr_robot/Desktop/Git/rom_robotics/data/app/rom_dynamics_multi_robots_gui-linux-linux-v0.0.1.AppImage",
             "description": "Path to the ROM GUI AppImage file"
+          },
+          "robotCodeSync.tuningAppPath": {
+            "type": "string",
+            "default": "/home/mr_robot/data/app/tuning_app-linux-linux-v0.0.1.AppImage",
+            "description": "Path to the Tuning App AppImage file"
           }
         }
       }
