@@ -117,6 +117,9 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(vscode.commands.registerCommand('robot-code-sync.syncThirdpartyDriversWsToRobot', () => 
 		performSync('thirdparty_drivers_ws_sourcePath', 'thirdparty_drivers_ws_destinationPath', 'thirdparty_drivers_ws')));
 	
+	context.subscriptions.push(vscode.commands.registerCommand('robot-code-sync.syncMaintainWsToRobot', () => 
+		performSync('rom_maintain_ws_sourcePath', 'rom_maintain_ws_destinationPath', 'rom_maintain_ws')));
+	
 	context.subscriptions.push(vscode.commands.registerCommand('robot-code-sync.syncAllToRobot', () => 
 		performSync('all_sourcePath', 'all_destinationPath', 'All')));
 
@@ -147,6 +150,7 @@ export function activate(context: vscode.ExtensionContext) {
 	const buildNav2Command = createBuildCommand('RomNav2Ws', 'rom_nav2_ws');
 	const buildDriversCommand = createBuildCommand('RomDriversWs', 'rom_drivers_ws');
 	const buildThirdpartyCommand = createBuildCommand('ThirdpartyDriversWs', 'thirdparty_drivers_ws');
+	const buildMaintainCommand = createBuildCommand('RomMaintainWs', 'rom_maintain_ws');
 
 	// Register Build All command
 	const buildAllCommand = vscode.commands.registerCommand('robot-code-sync.buildAll', async () => {
@@ -159,7 +163,7 @@ export function activate(context: vscode.ExtensionContext) {
 			shellPath: '/bin/bash'
 		});
 
-		const buildCommand = 'cd ~/rom_sdk_ws && colcon build && cd ~/rom_drivers_ws && colcon build && cd ~/rom_nav2_ws && colcon build';
+		const buildCommand = 'cd ~/rom_sdk_ws && colcon build && cd ~/rom_drivers_ws && colcon build && cd ~/rom_nav2_ws && colcon build && cd ~/rom_maintain_ws && colcon build';
 
 		if (robotPassword) {
 			terminal.sendText(`sshpass -p '${robotPassword}' ssh -t ${robotHost} "${buildCommand}"`);
@@ -270,6 +274,7 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(buildNav2Command);
 	context.subscriptions.push(buildDriversCommand);
 	context.subscriptions.push(buildThirdpartyCommand);
+	context.subscriptions.push(buildMaintainCommand);
 	context.subscriptions.push(buildAllCommand);
 	context.subscriptions.push(runGuiCommand);
 	context.subscriptions.push(runTuningAppCommand);

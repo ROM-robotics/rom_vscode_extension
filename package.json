@@ -40,6 +40,10 @@
         "title": "Robot Code Sync: Sync thirdparty_drivers_ws to Robot"
       },
       {
+        "command": "robot-code-sync.syncMaintainWsToRobot",
+        "title": "Robot Code Sync: Sync rom_maintain_ws to Robot"
+      },
+      {
         "command": "robot-code-sync.syncAllToRobot",
         "title": "Robot Code Sync: Sync All to Robot"
       },
@@ -58,6 +62,10 @@
       {
         "command": "robot-code-sync.buildThirdpartyDriversWs",
         "title": "Robot Code Sync: Build thirdparty_drivers_ws"
+      },
+      {
+        "command": "robot-code-sync.buildRomMaintainWs",
+        "title": "Robot Code Sync: Build rom_maintain_ws"
       },
       {
         "command": "robot-code-sync.buildAll",
@@ -198,6 +206,21 @@
           "robotCodeSync.thirdparty_drivers_ws_destinationPath": {
             "type": "string",
             "default": "/home/mr_robot/Desktop/Git/rom_robotics/thirdparty_drivers_ws",
+            "description": "Destination Path"
+          }
+        }
+      },
+      {
+        "title": "rom_maintain_ws",
+        "properties": {
+          "robotCodeSync.rom_maintain_ws_sourcePath": {
+            "type": "string",
+            "default": "/home/mr_robot/Desktop/Git/rom_robotics/rom_maintain_ws",
+            "description": "Source Path"
+          },
+          "robotCodeSync.rom_maintain_ws_destinationPath": {
+            "type": "string",
+            "default": "/home/mr_robot/Desktop/Git/rom_robotics/rom_maintain_ws",
             "description": "Destination Path"
           }
         }
