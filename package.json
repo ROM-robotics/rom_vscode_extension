@@ -2,7 +2,7 @@
   "name": "robot-code-sync",
   "displayName": "Robot Code Sync",
   "description": "Sync code to robot using rsync with one button click",
-  "version": "0.0.1",
+  "version": "1.0.8",
   "publisher": "rom-robotics-llc",
   "icon": "rom_logo.png",
   "engines": {
@@ -11,7 +11,9 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [

@@ -86,17 +86,33 @@ export function activate(context: vscode.ExtensionContext) {
 
 	console.log('Robot Code Sync extension is now active!');
 
-	// Create status bar item
-	const statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
-	statusBarItem.command = 'robot-code-sync.syncNav2WsToRobot';
-	statusBarItem.text = '$(cloud-upload) Sync to Robot';
-	statusBarItem.tooltip = 'Click to sync code to robot';
-	
+	// Create status bar items with blue background
 	const config = vscode.workspace.getConfiguration('robotCodeSync');
-	if (config.get('showStatusBar', true)) {
-		statusBarItem.show();
-	}
-	context.subscriptions.push(statusBarItem);
+	const showStatusBar = config.get('showStatusBar', true);
+
+	// Helper function to create status bar button
+	const createStatusBarButton = (text: string, tooltip: string, command: string, priority: number) => {
+		const button = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, priority);
+		button.text = text;
+		button.tooltip = tooltip;
+		button.command = command;
+		button.backgroundColor = new vscode.ThemeColor('statusBarItem.prominentBackground');
+		if (showStatusBar) {
+			button.show();
+		}
+		context.subscriptions.push(button);
+		return button;
+	};
+
+	// Create 8 status bar buttons (ordered left to right: Data, Drivers, SDK, Nav2, Maintain, thirdparty, Sync All, Build All)
+	createStatusBarButton('$(database) Data', 'Sync ~/data to robot', 'robot-code-sync.syncDataToRobot', 108);
+	createStatusBarButton('$(circuit-board) Drivers', 'Sync rom_drivers_ws to robot', 'robot-code-sync.syncDriversWsToRobot', 107);
+	createStatusBarButton('$(package) SDK', 'Sync rom_sdk_ws to robot', 'robot-code-sync.syncSdkWsToRobot', 106);
+	createStatusBarButton('$(folder) Nav2', 'Sync nav2_ws to robot', 'robot-code-sync.syncNav2WsToRobot', 105);
+	createStatusBarButton('$(wrench) Maintain', 'Sync rom_maintain_ws to robot', 'robot-code-sync.syncMaintainWsToRobot', 104);
+	createStatusBarButton('$(extensions) thirdparty', 'Sync thirdparty_drivers_ws to robot', 'robot-code-sync.syncThirdpartyDriversWsToRobot', 103);
+	createStatusBarButton('$(cloud-upload) Sync All', 'Sync all workspaces to robot', 'robot-code-sync.syncAllToRobot', 102);
+	createStatusBarButton('$(tools) Build All', 'Build all workspaces on robot', 'robot-code-sync.buildAll', 101);
 
 	// Register all sync commands
 	context.subscriptions.push(vscode.commands.registerCommand('robot-code-sync.syncNav2WsToRobot', () => 
